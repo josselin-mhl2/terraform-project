@@ -1,5 +1,5 @@
 
-resource "aws_vpc" "pub-aws" {
+resource "aws_vpc" "main" {
   cidr_block = "172.16.0.0/21"
 
   tags = {
@@ -8,7 +8,7 @@ resource "aws_vpc" "pub-aws" {
 }
 
 resource "aws_subnet" "pub_a" {
-  vpc_id = aws_vpc.mail.vpc_id
+  vpc_id = aws_vpc.main.vpc_id
   cidr_block = "172.16.0.0/24"
 
   availability_zone = "us-east-1a"
