@@ -1,0 +1,52 @@
+name: terraform-plan-manual
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+env:
+  PREFIX_NAME: "peter"
+  LOCATION: "us-east-1"
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  terraform-plan:
+    name: 'Terraform Plan'
+    runs-on: ubuntu-latest  
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.LOCATION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+      
+      - name: Terraform init
+        id: init 
+        shell: bash
+        working-directory: .
+        run: |
+          terraform init -upgrade
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: .
+        run: | 
+          terraform plan -input=false
+
+      - name: Terraform Apply
+        id: apply
+        shell: bash
+        working-directory: .
+        run: | 
+          terraform apply -auto-approve -input=false
